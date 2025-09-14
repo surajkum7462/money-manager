@@ -25,8 +25,13 @@ public class ProfileController {
   @PostMapping("/register")
   public ResponseEntity<ProfileDto> registerProfile(@RequestBody ProfileDto profileDto) {
     ProfileDto registeredProfile = profileService.registerProfile(profileDto);
-    System.out.println(registeredProfile);
-    return ResponseEntity.status(HttpStatus.CREATED).body(registeredProfile);
+    if(registeredProfile==null)
+    {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+    }
+    return ResponseEntity.ok(registeredProfile);
+    // System.out.println(registeredProfile);
+    
   }
 
   
