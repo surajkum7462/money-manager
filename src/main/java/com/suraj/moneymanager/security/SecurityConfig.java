@@ -2,6 +2,7 @@ package com.suraj.moneymanager.security;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,6 +32,9 @@ public class SecurityConfig {
 
   private final JwtRequestFilter jwtRequestFilter;
 
+  @Value("${MONEY_MANAGER_FRONTEND_URL}")
+  private String frontedUrl;
+
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
@@ -50,17 +54,33 @@ public class SecurityConfig {
     return new BCryptPasswordEncoder();
   }
 
+  // @Bean
+  // public CorsConfigurationSource configurationSource() {
+  //   CorsConfiguration configuration = new CorsConfiguration();
+  //   configuration.setAllowedOriginPatterns(List.of("*"));
+  //   configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+  //   configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+  //   configuration.setAllowCredentials(true);
+  //   UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+  //   source.registerCorsConfiguration("/**", configuration);
+  //   return source;
+  // }
+
   @Bean
-  public CorsConfigurationSource configurationSource() {
+public CorsConfigurationSource configurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
-    configuration.setAllowedOriginPatterns(List.of("*"));
+    configuration.setAllowedOrigins(List.of(frontedUrl)); // frontend local
+    configuration.addAllowedOrigin("https://your-frontend-domain.com"); // add production frontend if deployed
     configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
     configuration.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+    configuration.setExposedHeaders(List.of("Authorization")); // optional, if you return tokens in header
     configuration.setAllowCredentials(true);
+
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
     return source;
-  }
+}
+
 
   @Bean
   public AuthenticationManager authenticationManager() {
