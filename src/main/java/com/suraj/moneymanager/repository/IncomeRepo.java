@@ -30,6 +30,8 @@ public interface  IncomeRepo extends JpaRepository<IncomeEntity, Long>{
 
 // select * from income where profile_id = ? 1 and date between ? 2 and ? 3
   List<IncomeEntity> findByProfileIdAndDateBetween(Long profileId, LocalDate startDate, LocalDate endDate);
+
+  List<IncomeEntity> findByProfileId(Long id);
   
   
 }

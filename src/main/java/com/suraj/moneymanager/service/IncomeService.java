@@ -117,5 +117,11 @@ public class IncomeService {
      return incomes.stream().map(this::toDTO).toList();
    }
   
+
+    public List<IncomeDTO> getAllIncomesForCurrentUser() {
+	    ProfileEntity profile = profileService.getCurrentProfile();
+	    List<IncomeEntity> incomes = incomeRepo.findByProfileId(profile.getId());
+	    return incomes.stream().map(this::toDTO).toList();
+	}
   
 }
