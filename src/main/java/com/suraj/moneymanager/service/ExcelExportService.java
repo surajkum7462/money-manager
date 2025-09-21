@@ -13,6 +13,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
+import com.suraj.moneymanager.dto.ExpenseDTO;
 import com.suraj.moneymanager.dto.IncomeDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class ExcelExportService {
 
     private final IncomeService incomeService;
+    private final ExpenseService expenseService;
 
     public byte[] generateIncomeExcel() {
         try (Workbook workbook = new XSSFWorkbook()) {
@@ -69,6 +71,54 @@ public class ExcelExportService {
 
         } catch (Exception e) {
             throw new RuntimeException("Error generating income Excel: " + e.getMessage());
+        }
+    }
+     public byte[] generateExpenseExcel() {
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Expense Details");
+
+            // Header style
+            CellStyle headerStyle = workbook.createCellStyle();
+            Font font = workbook.createFont();
+            font.setBold(true);
+            headerStyle.setFont(font);
+
+            // Header row
+            Row headerRow = sheet.createRow(0);
+            String[] columns = {"ID", "Name", "Category", "Icon", "Amount", "Date", "Created At", "Updated At"};
+            for (int i = 0; i < columns.length; i++) {
+                Cell cell = headerRow.createCell(i);
+                cell.setCellValue(columns[i]);
+                cell.setCellStyle(headerStyle);
+            }
+
+            // Fetch expenses
+            List<ExpenseDTO> expenses = expenseService.getAllExpenseForCurrentUser();
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+            int rowNum = 1;
+            for (ExpenseDTO expense : expenses) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(expense.getId() != null ? expense.getId() : 0);
+                row.createCell(1).setCellValue(expense.getName() != null ? expense.getName() : "");
+                row.createCell(2).setCellValue(expense.getCategoryName() != null ? expense.getCategoryName() : "N/A");
+                row.createCell(3).setCellValue(expense.getIcon() != null ? expense.getIcon() : "");
+                row.createCell(4).setCellValue(expense.getAmount() != null ? expense.getAmount().toPlainString() : "0.00");
+                row.createCell(5).setCellValue(expense.getDate() != null ? expense.getDate().format(dateFormatter) : "N/A");
+                row.createCell(6).setCellValue(expense.getCreatedAt() != null ? expense.getCreatedAt().format(dateFormatter) : "N/A");
+                row.createCell(7).setCellValue(expense.getUpdatedAt() != null ? expense.getUpdatedAt().format(dateFormatter) : "N/A");
+            }
+
+            for (int i = 0; i < columns.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            workbook.write(bos);
+            return bos.toByteArray();
+
+        } catch (Exception e) {
+            throw new RuntimeException("Error generating expense Excel: " + e.getMessage());
         }
     }
 }

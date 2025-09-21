@@ -39,4 +39,27 @@ public class EmailController {
             return ResponseEntity.internalServerError().body("Failed to send email: " + e.getMessage());
         }
     }
+    @GetMapping("/expense-excel")
+    public ResponseEntity<String> sendExpenseExcelEmail() {
+        try {
+            // Generate Excel file
+            byte[] excelBytes = excelExportService.generateExpenseExcel();
+            String toEmail = profileService.getCurrentProfile().getEmail();
+
+            // Send email with attachment
+            emailService.sendEmailWithAttachment(
+            		toEmail, // TODO: replace with logged-in user's email
+                    "Your Expense Report",
+                    "Please find attached your latest expense report.",
+                    
+                    "expense_details.xlsx",
+                    excelBytes
+            );
+
+            return ResponseEntity.ok("Expense Excel emailed successfully to !"+toEmail);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body("Failed to send expense excel: " + e.getMessage());
+        }
+    }
 }
