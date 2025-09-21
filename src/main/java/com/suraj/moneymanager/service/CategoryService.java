@@ -79,4 +79,12 @@ public class CategoryService {
     return toDTO(updatedCategory);
   }
 
+  public void deleteCategory(Long id)
+  {
+	  ProfileEntity profile=profileService.getCurrentProfile();
+	    CategoryEntity category=categoryRepo.findByIdAndProfileId(id, profile.getId()).orElseThrow(() -> new RuntimeException("Category not found"));
+	    categoryRepo.delete(category);
+  }
+
+
 }
