@@ -36,6 +36,26 @@ public class EmailService {
     }
 }
 
+ public void sendEmailWithAttachment(String to, String subject, String body, String filename, byte[] attachment) {
+	    try {
+	        MimeMessage message = mailSender.createMimeMessage();
+	        MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+	        helper.setFrom(fromEmail);
+	        helper.setTo(to);
+	        helper.setSubject(subject);
+	        helper.setText(body, true);
+
+	        helper.addAttachment(filename, () -> new java.io.ByteArrayInputStream(attachment));
+
+	        mailSender.send(message);
+
+	    } catch (Exception e) {
+	        throw new RuntimeException("Failed to send email with attachment: " + e.getMessage());
+	    }
+	}
+
+
 
   
 }
