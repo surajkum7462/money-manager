@@ -37,6 +37,9 @@ public class ProfileService {
   @Value("${app.activation.url}")
   private String activationUrl;
 
+  @Value("${money.manager.frontend.url}")
+  private String frontendUrl;
+
   public ProfileDto registerProfile(ProfileDto profileDto) {
     ProfileEntity newProfile = toEntity(profileDto);
     newProfile.setActivationToken(UUID.randomUUID().toString());
@@ -141,7 +144,7 @@ public class ProfileService {
       user.setResetPasswordToken(token);
       profileRepo.save(user);
 
-      String resetLink = "http://localhost:5173/reset-password?token=" + token; // Frontend reset page
+      String resetLink = frontendUrl+"/reset-password?token=" + token; // Frontend reset page
       String subject = "Reset Your Password";
       String body = "Click the link below to reset your password:<br/><a href='" + resetLink + "'>Reset Password</a>";
 
