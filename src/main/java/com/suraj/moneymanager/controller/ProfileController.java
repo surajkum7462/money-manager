@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -62,11 +63,35 @@ public class ProfileController {
     
   }
 
+  @PostMapping("/forgot-password")
+  public ResponseEntity<String> forgotPassword(@RequestBody Map<String, String> request) {
+      String email = request.get("email");
+      profileService.sendForgotPasswordEmail(email);
+      return ResponseEntity.ok("Password reset link sent to your email if it exists.");
+  }
+
+  // Reset password
+  @PostMapping("/reset-password")
+  public ResponseEntity<String> resetPassword(@RequestBody Map<String, String> request) {
+      String token = request.get("token");
+      String newPassword = request.get("password");
+      profileService.resetPassword(token, newPassword);
+      return ResponseEntity.ok("Password has been reset successfully.");
+  }
+
    @GetMapping("/profile")
   public ResponseEntity<ProfileDto> getProfile() {
     ProfileDto profile = profileService.getPublicProfile(null);
     return ResponseEntity.ok(profile);
   }
+
+   @PutMapping("/update-profile-image")
+  public ResponseEntity<ProfileDto> updateProfileImage(@RequestBody Map<String, String> request) {
+      String imageUrl = request.get("profileImageUrl");
+      ProfileDto updatedProfile = profileService.updateProfileImage(imageUrl);
+      return ResponseEntity.ok(updatedProfile);
+  }
+
 
  
   

@@ -17,23 +17,22 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name="tbl_profiles")
+@Table(name = "tbl_profiles")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class ProfileEntity {
 
-
   @Id
-  @GeneratedValue(strategy=GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
   private String fullName;
-  @Column(unique=true)
+  @Column(unique = true)
   private String email;
   private String password;
   private String profileImageUrl;
-  @Column(updatable=false)
+  @Column(updatable = false)
   @CreationTimestamp
   private LocalDate createdAt;
   @UpdateTimestamp
@@ -41,15 +40,12 @@ public class ProfileEntity {
   private Boolean isActive;
 
   private String activationToken;
+  private String resetPasswordToken;
 
-  public void prePersist()
-  {
-    if(this.isActive == null)
-    {
+  public void prePersist() {
+    if (this.isActive == null) {
       this.isActive = false;
     }
   }
-
-  
 
 }

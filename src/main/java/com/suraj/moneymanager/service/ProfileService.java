@@ -121,6 +121,45 @@ public class ProfileService {
         .build();
 
   }
+  
+  public ProfileDto updateProfileImage(String imageUrl) {
+	    ProfileEntity currentUser = getCurrentProfile(); // gets logged-in user from SecurityContext
+	    currentUser.setProfileImageUrl(imageUrl);
+	    profileRepo.save(currentUser);
+	    return toDto(currentUser);
+	}
+
+
+  
+  public void sendForgotPasswordEmail(String email) {
+      Optional<ProfileEntity> profileOpt = profileRepo.findByEmail(email);
+      if(profileOpt.isEmpty()) {
+          throw new RuntimeException("User not found with email: " + email);
+      }
+      ProfileEntity user = profileOpt.get();
+      String token = UUID.randomUUID().toString();
+      user.setResetPasswordToken(token);
+      profileRepo.save(user);
+
+      String resetLink = "http://localhost:5173/reset-password?token=" + token; // Frontend reset page
+      String subject = "Reset Your Password";
+      String body = "Click the link below to reset your password:<br/><a href='" + resetLink + "'>Reset Password</a>";
+
+      emailService.sendEmail(user.getEmail(), subject, body);
+  }
+
+  // 2. Reset Password Using Token
+  public void resetPassword(String token, String newPassword) {
+      ProfileEntity user = profileRepo.findByResetPasswordToken(token)
+          .orElseThrow(() -> new RuntimeException("Invalid or expired reset token"));
+
+      user.setPassword(passwordEncoder.encode(newPassword));
+      user.setResetPasswordToken(null); // Clear token after reset
+      profileRepo.save(user);
+  }
+
+
+  
 
   public Map<String, Object> authenticateAndGenerateToken(AuthDTO authDTO) {
     try {
